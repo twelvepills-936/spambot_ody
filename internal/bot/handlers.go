@@ -51,6 +51,11 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 
 	result := b.filter.Analyze(msg)
 
+	// Debug: log suspicious messages
+	if result.Score > 0 {
+		log.Printf("Suspicious message from %s (%d) in chat %d: score=%d, reasons=%v, text=%q", displayName(msg.From), userID, chatID, result.Score, result.Reasons, messageText(msg))
+	}
+
 	// Always count the message regardless of outcome.
 	defer b.store.IncrementMessageCount(userID)
 
