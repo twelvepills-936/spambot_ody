@@ -82,3 +82,13 @@ func (b *Bot) Stop() {
 	b.api.StopReceivingUpdates()
 	close(b.stop)
 }
+
+// SetWebhook sets the webhook URL for the bot.
+func (b *Bot) SetWebhook(url string) error {
+	config, err := tgbotapi.NewWebhook(url)
+	if err != nil {
+		return err
+	}
+	_, err = b.api.Request(config)
+	return err
+}

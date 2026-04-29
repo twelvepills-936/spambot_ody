@@ -33,6 +33,16 @@ func main() {
 		log.Fatalf("bot init: %v", err)
 	}
 
+	// Set webhook if WEBHOOK_URL is provided
+	webhookURL := os.Getenv("WEBHOOK_URL")
+	if webhookURL != "" {
+		if err := b.SetWebhook(webhookURL); err != nil {
+			log.Printf("Failed to set webhook: %v", err)
+		} else {
+			log.Printf("Webhook set to %s", webhookURL)
+		}
+	}
+
 	log.Println("Odyssey Shield (MVP) started")
 
 	// Webhook handler
