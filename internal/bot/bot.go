@@ -56,6 +56,7 @@ func New(cfg *config.Config, store *storage.Storage) (*Bot, error) {
 }
 
 // Start begins polling for updates. Blocks until Stop() is called.
+// Deprecated: Use HandleUpdate for webhook mode.
 func (b *Bot) Start() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
@@ -69,6 +70,11 @@ func (b *Bot) Start() {
 			return
 		}
 	}
+}
+
+// HandleUpdate processes a single update from webhook.
+func (b *Bot) HandleUpdate(update tgbotapi.Update) {
+	b.handleUpdate(update)
 }
 
 // Stop shuts down the update loop.

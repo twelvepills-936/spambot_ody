@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: odyssey-shield-bot
+    runtime: go
+    buildCommand: go build -o main .
+    startCommand: ./main
+    envVars:
+      - key: PORT
+        generateValue: true
+      - key: BOT_TOKEN
+        sync: false  # Set in Render dashboard
+      - key: LOG_CHANNEL_ID
+        sync: false
+      # Add other env vars as needed
