@@ -39,8 +39,9 @@ trusted_usernames: []
   # - "durov"
 
 # Chat IDs whose forwarded messages are treated as trustworthy.
-trusted_chats: []
-  # - -1001234567890
+trusted_chats:
+  - -1001171895472
+  - -1001230724491
 
 # ── Domain allow/block lists ─────────────────────────────────────
 # Whitelisted domains lower the risk score by 10 per match.
