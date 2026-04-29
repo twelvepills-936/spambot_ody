@@ -13,7 +13,7 @@ proxy_url: "socks5://9b26e160:66e9f07226@84.54.8.251:30042"
 
 # Group / supergroup ID where moderation logs are posted.
 # The bot must be a member of this chat.
-log_channel_id: -1003469131826
+log_channel_id: -1003716257383
 
 # ── New-user strictness ──────────────────────────────────────────
 # First N messages from any user are filtered with a 1.5× risk multiplier.
