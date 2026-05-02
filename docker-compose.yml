@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  warp:
+    image: dublok/cloudflare-warp:latest
+    container_name: warp-socks
+    restart: always
+    ports:
+      - "1080:1080"
+    volumes:
+      - warp-data:/var/lib/cloudflare-warp
+
+volumes:
+  warp-data:
