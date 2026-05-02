@@ -51,6 +51,8 @@ var ScamJobPatterns = []WeightedPattern{
 	p(`напиши.{0,10}личку`, 20, "dm_me2"),
 	p(`\bвакансия\b`, 10, "vacancy"),
 	p(`зарабатывай`, 15, "earn"),
+	p(`заработать`, 15, "earn_money"),
+	p(`быстро.{0,10}заработать`, 20, "quick_earn"),
 	p(`пассивный.{0,5}доход`, 20, "passive_income"),
 	p(`работа.{0,10}дому`, 15, "wfh"),
 	p(`\d+\s*[₽$€]\s*в\s*день`, 25, "money_per_day"),
@@ -67,6 +69,7 @@ var CTAPatterns = []WeightedPattern{
 	p(`ограниченное.{0,10}предложение`, 20, "limited_offer"),
 	p(`не упусти`, 10, "dont_miss"),
 	p(`пиши сейчас|напиши сейчас`, 15, "write_now"),
+	p(`пишите`, 10, "write"),
 	p(`успей.{0,15}записаться`, 15, "sign_up_now"),
 	p(`бесплатно.{0,10}первым`, 15, "free_first"),
 }
