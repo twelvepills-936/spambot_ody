@@ -60,6 +60,19 @@ var ScamJobPatterns = []WeightedPattern{
 	p(`ищу.{0,10}сотрудник`, 15, "hiring"),
 	p(`партнёрство`, 10, "partnership"),
 	p(`написать.{0,10}менеджер`, 15, "write_manager"),
+	p(`нужны.{0,10}люди`, 20, "need_people"),
+	p(`на.{0,10}халтурку`, 20, "odd_jobs"),
+	p(`лёгкий.{0,10}онлайн.{0,5}доход`, 20, "easy_online_income"),
+	p(`стабильно.{0,10}от.{0,10}\d+`, 15, "stable_from_amount"),
+	p(`подойдёт.{0,10}новичкам`, 15, "for_beginners"),
+	p(`работаешь.{0,10}когда.{0,10}удобно`, 15, "work_when_convenient"),
+	p(`полностью.{0,10}легально`, 15, "fully_legal"),
+	p(`хочешь.{0,10}денег`, 20, "want_money"),
+	p(`пиши.{0,5}в\s+л_с`, 20, "write_ls"),
+	p(`помогу.{0,10}финансами`, 20, "help_with_finances"),
+	p(`есть.{0,10}темка`, 20, "have_topic"),
+	p(`за пару.{0,10}часов`, 15, "few_hours"),
+	p(`\d+к\s*в\s*день`, 25, "k_per_day"),
 }
 
 // Generic spam call-to-action phrases.

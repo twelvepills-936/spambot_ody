@@ -62,6 +62,12 @@ func (f *Filter) Analyze(msg *tgbotapi.Message) Result {
 	var score int
 	var reasons []string
 
+	// Check for spam replies
+	if msg.ReplyToMessage != nil && (strings.TrimSpace(text) == "+" || strings.TrimSpace(text) == "спасибо" || len(strings.TrimSpace(text)) <= 3) {
+		score += 50
+		reasons = append(reasons, "spam_reply")
+	}
+
 	userID := msg.From.ID
 	chatID := msg.Chat.ID
 
