@@ -75,6 +75,17 @@ var ScamJobPatterns = []WeightedPattern{
 	p(`\d+к\s*в\s*день`, 25, "k_per_day"),
 }
 
+// Ban-tier scams (weight ≥ default ban threshold 80 — one hit ⇒ ban).
+var BanPatterns = []WeightedPattern{
+	p(`подшабаш|подшабабаш`, 85, "ban_odd_job_slang"),
+	p(`наличными\s+на\s+руки.{0,60}отзовитесь\s+в\s+личку|отзовитесь\s+в\s+личку.{0,80}наличными\s+на\s+руки`, 85, "ban_cash_hands_dm"),
+	p(`выгодные\s+условия\s+вознаграждения.{0,40}каждый\s+день\s+наличными`, 85, "ban_daily_cash_reward"),
+	p(`купить\s+usdt\s+за\s+налич|usdt\s+за\s+наличн`, 85, "ban_usdt_cash"),
+	p(`банкомат.{0,80}обмен|обмен.{0,40}usdt`, 85, "ban_usdt_atm_meetup"),
+	p(`нужны\s+деньги.{0,60}стартуй`, 85, "ban_need_money_start"),
+	p(`пиши\s+и\s+стартуй`, 85, "ban_write_and_start"),
+}
+
 // Generic spam call-to-action phrases.
 var CTAPatterns = []WeightedPattern{
 	p(`только сегодня`, 15, "only_today"),

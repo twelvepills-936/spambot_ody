@@ -67,13 +67,11 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 	username := displayName(msg.From)
 	reason := fmt.Sprintf("score=%d reasons=[%s]", result.Score, strings.Join(result.Reasons, ", "))
 
-	// Attempt to delete the message first
-	if !b.deleteMessage(chatID, msg.MessageID) {
-		log.Printf("Failed to delete message %d in chat %d, skipping moderation action", msg.MessageID, chatID)
-		return
+	deleted := b.deleteMessage(chatID, msg.MessageID)
+	if !deleted {
+		log.Printf("Failed to delete message %d in chat %d before moderation, continuing", msg.MessageID, chatID)
 	}
 
-	// Message deleted successfully, proceed with moderation
 	b.store.SaveDeleted(chatID, msg.MessageID, userID, username, truncate(text, 300), reason, result.Score)
 
 	switch result.Action {
@@ -89,14 +87,22 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 		b.banUser(chatID, userID)
 		b.sendModLog(chatID, msg.MessageID, userID, username, text, reason, result.Score, result.Action)
 	}
+
+	if !deleted {
+		if b.deleteMessage(chatID, msg.MessageID) {
+			log.Printf("Deleted message %d in chat %d after moderation action", msg.MessageID, chatID)
+		}
+	}
 }
 
 // ── Callback handler ──────────────────────────────────────────────
 
 // Callback data format:
-//   res|<chatID>|<msgID>|<userID>   — restore (unban/unmute)
-//   mut|<chatID>|<userID>           — mute 24 h
-//   ban|<chatID>|<userID>           — ban
+//   res|<chatID>|<msgID>|<userID>      — restore (unban/unmute)
+//   mut|<chatID>|<msgID>|<userID>      — mute 24 h (+ delete message msgID in chat)
+//   ban|<chatID>|<msgID>|<userID>      — ban (+ delete message if still present)
+//   mut|<chatID>|<userID>              — legacy mute without msgID
+//   ban|<chatID>|<userID>              — legacy ban without msgID
 
 func (b *Bot) handleCallback(cb *tgbotapi.CallbackQuery) {
 	parts := strings.Split(cb.Data, "|")
@@ -141,12 +147,27 @@ func (b *Bot) handleCallback(cb *tgbotapi.CallbackQuery) {
 		b.answerCallback(cb.ID, "✅ Пользователь восстановлен")
 
 	case "mut":
-		targetUserID, e := strconv.ParseInt(parts[2], 10, 64)
+		var targetMsgID int
+		var targetUserID int64
+		var e error
+		if len(parts) >= 4 {
+			targetMsgID, e = strconv.Atoi(parts[2])
+			if e != nil {
+				b.answerCallback(cb.ID, "❌ Ошибка данных")
+				return
+			}
+			targetUserID, e = strconv.ParseInt(parts[3], 10, 64)
+		} else {
+			targetUserID, e = strconv.ParseInt(parts[2], 10, 64)
+		}
 		if e != nil {
 			b.answerCallback(cb.ID, "❌ Ошибка данных")
 			return
 		}
 
+		if targetMsgID != 0 {
+			b.deleteMessage(chatID, targetMsgID)
+		}
 		b.muteUser(chatID, targetUserID, b.cfg.MuteDuration)
 
 		suffix := fmt.Sprintf("\n\n🔇 <b>Замучен 24ч</b> модератором %s", escapeHTML(moderatorName))
@@ -154,12 +175,27 @@ func (b *Bot) handleCallback(cb *tgbotapi.CallbackQuery) {
 		b.answerCallback(cb.ID, "🔇 Пользователь замучен")
 
 	case "ban":
-		targetUserID, e := strconv.ParseInt(parts[2], 10, 64)
+		var targetMsgID int
+		var targetUserID int64
+		var e error
+		if len(parts) >= 4 {
+			targetMsgID, e = strconv.Atoi(parts[2])
+			if e != nil {
+				b.answerCallback(cb.ID, "❌ Ошибка данных")
+				return
+			}
+			targetUserID, e = strconv.ParseInt(parts[3], 10, 64)
+		} else {
+			targetUserID, e = strconv.ParseInt(parts[2], 10, 64)
+		}
 		if e != nil {
 			b.answerCallback(cb.ID, "❌ Ошибка данных")
 			return
 		}
 
+		if targetMsgID != 0 {
+			b.deleteMessage(chatID, targetMsgID)
+		}
 		b.banUser(chatID, targetUserID)
 
 		suffix := fmt.Sprintf("\n\n🚫 <b>Забанен</b> модератором %s", escapeHTML(moderatorName))

@@ -12,9 +12,9 @@ import (
 // sendModLog posts a moderation event to the configured log channel.
 // Callback data fits within Telegram's 64-byte limit:
 //
-//	res|<chatID>|<msgID>|<userID>  ≤ 45 chars
-//	mut|<chatID>|<userID>          ≤ 29 chars
-//	ban|<chatID>|<userID>          ≤ 29 chars
+//	res|<chatID>|<msgID>|<userID>
+//	mut|<chatID>|<msgID>|<userID>
+//	ban|<chatID>|<msgID>|<userID>
 func (b *Bot) sendModLog(
 	chatID int64,
 	msgID int,
@@ -51,11 +51,11 @@ func (b *Bot) sendModLog(
 			),
 			tgbotapi.NewInlineKeyboardButtonData(
 				"🔇 Мут 24ч",
-				fmt.Sprintf("mut|%d|%d", chatID, userID),
+				fmt.Sprintf("mut|%d|%d|%d", chatID, msgID, userID),
 			),
 			tgbotapi.NewInlineKeyboardButtonData(
 				"🚫 Бан",
-				fmt.Sprintf("ban|%d|%d", chatID, userID),
+				fmt.Sprintf("ban|%d|%d|%d", chatID, msgID, userID),
 			),
 		),
 	)

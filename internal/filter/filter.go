@@ -78,6 +78,7 @@ func (f *Filter) Analyze(msg *tgbotapi.Message) Result {
 	score, reasons = applyPatterns(text, score, reasons, VPNPatterns)
 	score, reasons = applyPatterns(text, score, reasons, PhishingPatterns)
 	score, reasons = applyPatterns(text, score, reasons, ScamJobPatterns)
+	score, reasons = applyPatterns(text, score, reasons, BanPatterns)
 	score, reasons = applyPatterns(text, score, reasons, CTAPatterns)
 
 	// ── 2. Link analysis ────────────────────────────────────────
