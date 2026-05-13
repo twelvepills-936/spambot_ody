@@ -73,6 +73,50 @@ var ScamJobPatterns = []WeightedPattern{
 	p(`есть.{0,10}темка`, 20, "have_topic"),
 	p(`за пару.{0,10}часов`, 15, "few_hours"),
 	p(`\d+к\s*в\s*день`, 25, "k_per_day"),
+
+	// OCR / homoglyph amounts like "14O-23O$ в день" (Latin O as digit).
+	p(`\d+[oоOО]\s*[-–]\s*\d+[oоOО0]*\s*[$₽€]\s*в\s*день`, 35, "homoglyph_money_daily"),
+	p(`\d+\s*[$₽€]\s*\+\s*.{0,25}в\s*день`, 30, "money_plus_daily"),
+
+	// "No fees from you" + daily-pay job spam.
+	p(`без.{0,30}оплат.{0,25}с.{0,15}ваш`, 25, "no_payment_from_you"),
+	p(`ставьте.{0,20}\+.{0,25}сюда|кидайте.{0,20}плюс`, 25, "plus_dm_cta"),
+	p(`пиши\s*\+\s*сюда`, 30, "write_plus_here"),
+
+	// Ukrainian job / housing scam templates.
+	p(`не\s*віддалено`, 40, "ua_not_remote_spam"),
+	p(`робота.{0,50}(?:з|\+).{0,25}(?:житл|прожив)|житл(?:о|а).{0,30}(?:надаєм|включен|надає)|вакансії.{0,25}з.{0,15}житл`, 30, "ua_job_housing"),
+	p(`в\s*особист|в\s*дірект|особисті\s*повідомлен`, 25, "ua_write_dm"),
+	p(`шукаєм.{0,40}(?:працівник|співробітник)|потрібн.{0,30}(?:співробітник|працівник)`, 25, "ua_hiring"),
+	p(`допомог.{0,30}(?:з|зі)\s*документ`, 28, "ua_help_documents"),
+	p(`зарплат[аи].{0,30}\d+.{0,15}\$.{0,20}тиждень|тиждень.{0,25}\+.{0,20}бонус`, 28, "weekly_usd_salary_spam"),
+	p(`робот.{0,20}(?:в|з).{0,20}продаж`, 22, "sales_job_mention"),
+
+	// Warehouse / shift pay spam.
+	p(`приглашаем.{0,40}сотрудник.{0,50}склад|сотрудник.{0,40}на\s+склад`, 30, "warehouse_hiring"),
+	p(`от\s*\d[\d\s\u00a0]*₽.{0,25}за\s+смену|за\s+смену.{0,40}\d+.{0,20}₽`, 30, "shift_rub_spam"),
+
+	// Vague "easy money" + daily.
+	p(`пару.{0,20}часов.{0,35}свободн.{0,40}(?:от\s*\d|каждый\s*день)`, 28, "free_hours_daily_money"),
+	p(`каждый\s*день.{0,50}обращайся|обращайся.{0,60}каждый\s*день`, 22, "daily_money_contact"),
+
+	// Odd jobs / "errands" without leaving home.
+	p(`поручен.{0,25}на.{0,20}час`, 25, "errands_per_hour"),
+	p(`без.{0,20}движен.{0,30}оклад`, 25, "no_movement_salary"),
+
+	// Garage/yard cash-in-hand micro-jobs.
+	p(`участк.{0,40}уборк.{0,30}гараж|уборк.{0,30}гараж.{0,50}\d+`, 28, "garage_cleanup_job"),
+	p(`\d+.{0,15}р.{0,20}на\s+руки.{0,40}л\s*с|на\s+руки.{0,30}в\s*лс`, 28, "rub_cash_hands_ls"),
+
+	// Fake driver licence / boating licence docs.
+	p(`оформл(?:ение|лення).{0,40}водительск`, 30, "fake_driver_license"),
+	p(`документы\s+гимс|гимс.{0,25}[🚗⛵]|[🚗⛵].{0,20}гимс`, 30, "gims_docs_spam"),
+
+	// Caps-lock mass hiring + money (needs combo to reach warn).
+	p(`нужны\s+люди.{0,150}(?:в\s*день|₽|\$|р\s*\+)`, 35, "need_people_money_combo"),
+
+	// Telegram mini-app / story spam links (t.me/m/...).
+	p(`t\.me/m/[a-zA-Z0-9_-]+`, 30, "tme_m_path_spam"),
 }
 
 // Ban-tier scams (weight ≥ default ban threshold 80 — one hit ⇒ ban).
