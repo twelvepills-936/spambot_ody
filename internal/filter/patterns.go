@@ -94,11 +94,14 @@ var ScamJobPatterns = []WeightedPattern{
 
 	// Warehouse / shift pay spam.
 	p(`приглашаем.{0,40}сотрудник.{0,50}склад|сотрудник.{0,40}на\s+склад`, 30, "warehouse_hiring"),
-	p(`от\s*\d[\d\s\u00a0]*₽.{0,25}за\s+смену|за\s+смену.{0,40}\d+.{0,20}₽`, 30, "shift_rub_spam"),
+	p(`от\s*\d[\d\s]*₽.{0,25}за\s+смену|за\s+смену.{0,40}\d+.{0,20}₽`, 30, "shift_rub_spam"),
 
 	// Vague "easy money" + daily.
-	p(`пару.{0,20}часов.{0,35}свободн.{0,40}(?:от\s*\d|каждый\s*день)`, 28, "free_hours_daily_money"),
+	p(`имеешь.{0,25}пару.{0,20}часов|пару.{0,20}часов.{0,60}свободн`, 28, "free_hours_spam"),
+	p(`пару.{0,20}часов.{0,80}(?:от\s*[\d.]+|каждый\s*день|[oоOО]{2,})`, 30, "free_hours_daily_money"),
 	p(`каждый\s*день.{0,50}обращайся|обращайся.{0,60}каждый\s*день`, 22, "daily_money_contact"),
+	p(`[oоOО]{3,}[рpPР]?\s*(?:каждый\s*день|твои)|\d+\s*[oоOО]{2,}[рpPР]?\s*твои`, 32, "homoglyph_rub_spam"),
+	p(`несколько\s+часов.{0,60}[oоOО]{2,}`, 30, "hours_homoglyph_money"),
 
 	// Odd jobs / "errands" without leaving home.
 	p(`поручен.{0,25}на.{0,20}час`, 25, "errands_per_hour"),
@@ -106,14 +109,44 @@ var ScamJobPatterns = []WeightedPattern{
 
 	// Garage/yard cash-in-hand micro-jobs.
 	p(`участк.{0,40}уборк.{0,30}гараж|уборк.{0,30}гараж.{0,50}\d+`, 28, "garage_cleanup_job"),
-	p(`\d+.{0,15}р.{0,20}на\s+руки.{0,40}л\s*с|на\s+руки.{0,30}в\s*лс`, 28, "rub_cash_hands_ls"),
+	p(`ответственн.{0,50}участк.{0,50}(?:уборк|покос|помощ)`, 30, "responsible_yard_job"),
+	p(`покосить.{0,30}траву|газонокосилк`, 25, "lawn_mowing_job"),
+	p(`на\s+карту.{0,25}\d+\s*р|переводом\s+на\s+карту`, 28, "card_transfer_pay"),
+	p(`\d+.{0,15}р.{0,20}на\s+руки.{0,40}(?:л\s*с|личк)|на\s+руки.{0,30}(?:в\s*лс|писать)`, 30, "rub_cash_hands_ls"),
+	p(`\d+\s*р\s*\+.{0,40}в\s*д[еe]нь|до\s*\d+\s*часов?.{0,15}в\s*д[еe]нь`, 32, "rub_plus_hours_daily"),
 
 	// Fake driver licence / boating licence docs.
 	p(`оформл(?:ение|лення).{0,40}водительск`, 30, "fake_driver_license"),
 	p(`документы\s+гимс|гимс.{0,25}[🚗⛵]|[🚗⛵].{0,20}гимс`, 30, "gims_docs_spam"),
 
-	// Caps-lock mass hiring + money (needs combo to reach warn).
+	// Caps-lock mass hiring + money.
 	p(`нужны\s+люди.{0,150}(?:в\s*день|₽|\$|р\s*\+)`, 35, "need_people_money_combo"),
+	p(`срочн.{0,15}нужн.{0,15}люд|нужн.{0,10}люд.{0,80}(?:подработк|ваканс|выплат)`, 30, "urgent_need_people"),
+	p(`есть\s+шабашк|шабашк.{0,40}нужн.{0,15}люд`, 35, "odd_job_urgent_hire"),
+	p(`расч[её]т.{0,20}(?:сразу\s+)?на\s+месте|на\s+руки.{0,40}срочност`, 30, "cash_on_site_job"),
+
+	// Remote-work recruitment spam.
+	p(`удалёнк[аи].{0,30}18\+|18\+.{0,40}тыс.{0,20}ежедневн`, 32, "remote_18_daily_pay"),
+	p(`жду\s*["']?\+["']?\s*сюда|тыс\.?\s*ежедневн`, 28, "plus_here_daily_thousands"),
+	p(`набор.{0,25}удалённ|удалённ.{0,30}работ.{0,60}(?:₽|руб|сутки)`, 30, "remote_hiring_spam"),
+	p(`\d+[\d\s–-]*₽\s*в\s*сутки|от\s*\d+.{0,10}₽\s*в\s*сутки`, 30, "money_per_day_alt"),
+	p(`возможность\s+дохода|занятость\s+\d[\d\s–-]*час`, 28, "income_opportunity_spam"),
+	p(`с\s+телефона.{0,40}обучаем|обучаем.{0,40}пишите`, 25, "phone_train_dm"),
+
+	// USDT buy/sell spam.
+	p(`приобрету\s+usdt|usdt\s+trc\s*20|куплю\s+usdt`, 35, "usdt_buy_spam"),
+
+	// Mission / task reward spam.
+	p(`мис+и[йи].{0,40}наград.{0,30}(?:рубл|карточк)|наград.{0,30}\d+.{0,20}рубл`, 30, "mission_reward_spam"),
+
+	// Flyer / street promo gigs.
+	p(`раздач[уа].{0,25}листовок|листовок.{0,40}(?:метро|тц)|стоять\s+у\s+метро`, 28, "flyer_distribution_job"),
+	p(`ищу\s+ребят.{0,40}раздач|платим\s+сразу`, 25, "hiring_flyer_paid"),
+
+	// Greek / Latin homoglyph bait (mixed-script job spam).
+	p(`[\x{0370}-\x{03FF}].{0,400}(?:₽|руб|карт|личн|вложен)`, 40, "greek_homoglyph_job"),
+	p(`без\s+вложен.{0,60}напишит`, 28, "no_investment_dm"),
+	p(`напишит[еъ].{0,25}["']?\+["']?.{0,30}личн`, 30, "write_plus_dm"),
 
 	// Telegram mini-app / story spam links (t.me/m/...).
 	p(`t\.me/m/[a-zA-Z0-9_-]+`, 30, "tme_m_path_spam"),
@@ -121,7 +154,8 @@ var ScamJobPatterns = []WeightedPattern{
 
 // Ban-tier scams (weight ≥ default ban threshold 80 — one hit ⇒ ban).
 var BanPatterns = []WeightedPattern{
-	p(`подшабаш|подшабабаш`, 85, "ban_odd_job_slang"),
+	p(`подшабаш|подшабабаш|есть\s+шабашк|шабашк.{0,60}расч[её]т\s+сразу`, 85, "ban_odd_job_slang"),
+	p(`приобрету\s+usdt\s+trc|usdt\s+trc\s*20.{0,40}курс`, 85, "ban_usdt_trc20_buy"),
 	p(`наличными\s+на\s+руки.{0,60}отзовитесь\s+в\s+личку|отзовитесь\s+в\s+личку.{0,80}наличными\s+на\s+руки`, 85, "ban_cash_hands_dm"),
 	p(`выгодные\s+условия\s+вознаграждения.{0,40}каждый\s+день\s+наличными`, 85, "ban_daily_cash_reward"),
 	p(`купить\s+usdt\s+за\s+налич|usdt\s+за\s+наличн`, 85, "ban_usdt_cash"),
